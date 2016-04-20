@@ -10,13 +10,22 @@ def prediction(row):
     pclass = row['Pclass']
     p = 0
     if pclass == 1:
-        p = 0.629630
+        if sex == 'female':
+            p = 0.968085
+        elif sex == 'male':
+            p = 0.368852
     elif pclass == 2:
-        p = 0.472826
-    else:
-        p = 0.242363
+        if sex == 'female':
+            p = 0.921053
+        elif sex == 'male':
+            p = 0.157407
+    elif pclass == 3:
+        if sex == 'female':
+            p = 0.500000
+        elif sex == 'male':
+            p = 0.135447
 
-    return bernoulli.rvs(p)
+    return bernoulli.rvs(p) 
 
 
 def add_interval(row):
