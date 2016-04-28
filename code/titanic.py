@@ -1,10 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import bernoulli
-import seaborn as sns
+# import seaborn as sns
 plt.style.use('default')
 
 
+# Funcion utilizada para realizar la prediccion
+# del item h
 def prediction(row):
     sex = row['Sex']
     pclass = row['Pclass']
@@ -28,6 +30,8 @@ def prediction(row):
     return bernoulli.rvs(p)
 
 
+# Funcion utilizada para realizar la prediccion
+# del item h
 def prediction2(row):
     sex = row['Sex']
     pclass = row['Pclass']
@@ -35,78 +39,70 @@ def prediction2(row):
     p = 0
     if pclass == 1:
         if sex == 'female':
-            if fare_range == '[0,9]':
-                p = 1
-            elif fare_range == '[10,19]':
-                p = 1
-            elif fare_range == '[20,29]':
-                p = 0.75
+            if fare_range == '[20,29]':
+                p = 0.833333
             elif fare_range == '[30,39]':
-                p = 1
+                p = 1.000000
             elif fare_range == '[40,+[':
-                p = 0.9
+                p = 0.976744
         elif sex == 'male':
             if fare_range == '[0,9]':
-                p = 0.2
-            elif fare_range == '[10,19]':
-                p = 0.090909
-            elif fare_range == '[20,29]':
-                p = 0.428571
-            elif fare_range == '[30,39]':
                 p = 0
+            elif fare_range == '[20,29]':
+                p = 0.407407
+            elif fare_range == '[30,39]':
+                p = 0.478261
             elif fare_range == '[40,+[':
-                p = 0.285714
+                p = 0.348485
     elif pclass == 2:
         if sex == 'female':
-            if fare_range == '[0,9]':
-                p = 0.8
             if fare_range == '[10,19]':
-                p = 1
+                p = 0.909091
             elif fare_range == '[20,29]':
-                p = 0.857143
+                p = 0.900000
             elif fare_range == '[30,39]':
-                p = 1
+                p = 1.000000
             elif fare_range == '[40,+[':
-                p = 1
+                p = 1.000000
         elif sex == 'male':
             if fare_range == '[0,9]':
-                p = 0.294118
+                p = 0
             elif fare_range == '[10,19]':
-                p = 0.25
+                p = 0.158730
             elif fare_range == '[20,29]':
-                p = 0
+                p = 0.160000
             elif fare_range == '[30,39]':
-                p = 0
+                p = 0.375000
             elif fare_range == '[40,+[':
-                p = 0.062500
+                p = 0
     elif pclass == 3:
         if sex == 'female':
             if fare_range == '[0,9]':
-                p = 0.653846
+                p = 0.625000
             elif fare_range == '[10,19]':
-                p = 0.562500
+                p = 0.538462
             elif fare_range == '[20,29]':
-                p = 0.5
+                p = 0.350000
             elif fare_range == '[30,39]':
-                p = 0.8
+                p = 0.200000
             elif fare_range == '[40,+[':
-                p = 0.473684
+                p = 0.368421
         elif sex == 'male':
             if fare_range == '[0,9]':
-                p = 0.111111
+                p = 0.110204
             elif fare_range == '[10,19]':
-                p = 0.25
+                p = 0.250000
             elif fare_range == '[20,29]':
-                p = 0.107143
+                p = 0.150000
             elif fare_range == '[30,39]':
-                p = 0.142857
+                p = 0.200000
             elif fare_range == '[40,+[':
-                p =  0.153846
+                p = 0.170732
 
     return bernoulli.rvs(p)
 
 
-
+# Determina el intervalo de la variable Fare
 def add_interval(row):
     fare = row['Fare']
     interval = ''
@@ -123,19 +119,69 @@ def add_interval(row):
 
     return interval
 
-# Esto es para ver la proporción el porcentaje de sobrevivientes por cada grupo
-# y determinar prediction 2
-# survived = train[train.Survived == 1].groupby(['Pclass', 'Sex', 'fare_range']).size()
-# total = train.groupby(['Pclass', 'Sex', 'fare_range']).size()
-# print(survived/total)
+
 
 train = pd.read_csv('../data/titanic-train.csv', sep=';')
+train['fare_range'] = train.apply(add_interval, axis=1)
+
+
+# Esto es para ver la proporcion el porcentaje de sobrevivientes por cada grupo
+# y determinar prediction 1
+survived = train[train.Survived == 1].groupby(['Pclass', 'Sex']).size()
+total = train.groupby(['Pclass', 'Sex']).size()
+print('Proporciones para regla de predicción 1:')
+print(survived/total)
+
+
+# Esto es para ver la proporcion el porcentaje de sobrevivientes por cada grupo
+# y determinar prediction 2
+survived = train[train.Survived == 1].groupby(['Pclass', 'Sex', 'fare_range']).size()
+total = train.groupby(['Pclass', 'Sex', 'fare_range']).size()
+print('Proporciones para regla de predicción 2:')
+print(survived/total)
+
+
+precision = 0
+recall = 0
+for i in range(20):
+    train['prediction'] = train.apply(prediction, axis=1)
+    precision += train[train.prediction == 1][train.Survived == 1].size/float(train[train.prediction == 1].size)
+    recall += train[train.prediction == 1][train.Survived == 1].size/float(train[train.Survived == 1].size)
+
+print('Regla de predicción 1 Training data:')
+print('precision promedio: ' + str(precision/20))
+print('recall promedio: ' + str(recall/20))
+
+
+precision = 0
+recall = 0
+for i in range(20):
+    train['prediction'] = train.apply(prediction2, axis=1)
+    precision += train[train.prediction == 1][train.Survived == 1].size/float(train[train.prediction == 1].size)
+    recall += train[train.prediction == 1][train.Survived == 1].size/float(train[train.Survived == 1].size)
+
+print('Regla de predicción 2: Training data:')
+print('precision promedio: ' + str(precision/20))
+print('recall promedio: ' + str(recall/20))
+
+
+
+
 test = pd.read_csv('../data/titanic-test.csv')
 test_survived = pd.read_csv('../data/gendermodel.csv')
 test = pd.concat([test, test_survived], axis=1)
-
 test['fare_range'] = test.apply(add_interval, axis=1)
-print(test.head())
+
+precision = 0
+recall = 0
+for i in range(20):
+    test['prediction'] = test.apply(prediction, axis=1)
+    precision += test[test.prediction == 1][test.Survived == 1].size/float(test[test.prediction == 1].size)
+    recall += test[test.prediction == 1][test.Survived == 1].size/float(test[test.Survived == 1].size)
+
+print('Regla de predicción 1 Test data:')
+print('precision promedio: ' + str(precision/20))
+print('recall promedio: ' + str(recall/20))
 
 precision = 0
 recall = 0
@@ -144,5 +190,6 @@ for i in range(20):
     precision += test[test.prediction == 1][test.Survived == 1].size/float(test[test.prediction == 1].size)
     recall += test[test.prediction == 1][test.Survived == 1].size/float(test[test.Survived == 1].size)
 
+print('Regla de predicción 2 Test data:')
 print('precision promedio: ' + str(precision/20))
 print('recall promedio: ' + str(recall/20))
