@@ -1,9 +1,77 @@
+# coding=UTF-8
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import bernoulli
 # import seaborn as sns
-plt.style.use('default')
+#plt.style.use('default')
 
+pd.options.display.mpl_style = 'default'
+
+
+# a
+data = pd.read_csv('../data/titanic-train.csv', sep = ';')
+
+
+# b
+#shape: Return a tuple representing the dimensionality of the DataFrame.
+print data.shape
+#info: Concise summary of a DataFrame.
+print data.info()
+#describe: Generate various summary statistics, excluding NaN values.
+print data.describe()
+
+
+# c
+#head(n): Returns first n rows
+print data[['Sex','Survived']].head(10)
+#tail(n): Returns last n rows
+print data[['Sex','Survived']].tail(10)
+print data[['Sex','Survived']][200:210]
+
+print data['Sex'].value_counts()
+grouped_props_1 = data.groupby('Sex')['Survived'].value_counts()
+#print grouped_props_1
+grouped_props_1 = data.groupby('Sex')['Survived'].value_counts()/data.groupby('Sex').size()
+print grouped_props_1
+
+grouped_props_1.unstack().plot(kind='bar',grid=True)
+
+print data.groupby('Survived').size()
+grouped_props_2 = data.groupby('Survived')['Sex'].value_counts()
+#print grouped_props_2
+grouped_props_2 = data.groupby('Survived')['Sex'].value_counts()/data.groupby('Survived').size()
+print grouped_props_2
+
+grouped_props_2.unstack().plot(kind='bar', grid=True)
+
+
+# d
+print data['Sex'].value_counts()
+grouped_props_1 = data.groupby('Sex')['Survived'].value_counts()
+#print grouped_props_1
+grouped_props_1 = data.groupby('Sex')['Survived'].value_counts()/data.groupby('Sex').size()
+print grouped_props_1
+
+grouped_props_1.unstack().plot(kind='bar',grid=True)
+
+print data.groupby('Survived').size()
+grouped_props_2 = data.groupby('Survived')['Sex'].value_counts()
+#print grouped_props_2
+grouped_props_2 = data.groupby('Survived')['Sex'].value_counts()/data.groupby('Survived').size()
+print grouped_props_2
+
+# e
+
+
+
+# f
+#Se usa la edad promedio para imputar las edades
+mean_male = data[(data.Age.notnull()) & (data.Sex=='male')]['Age'].mean()
+print mean_male
+mean_female = data[(data.Age.notnull()) & (data.Sex=='female')]['Age'].mean()
+print mean_female
+data.loc[(data.Age.isnull()) & (data.Sex=='female'), 'Age'] = mean_female
+data.loc[(data.Age.isnull()) & (data.Sex=='male'), 'Age'] = mean_male
 
 # Funcion utilizada para realizar la prediccion
 # del item h
@@ -193,3 +261,7 @@ for i in range(20):
 print('Regla de predicción 2 Test data:')
 print('precision promedio: ' + str(precision/20))
 print('recall promedio: ' + str(recall/20))
+
+pd.options.display.mpl_style = None
+plt.show()
+pd.options.display.mpl_style = 'default'
