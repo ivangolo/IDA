@@ -2,8 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import bernoulli
-# import seaborn as sns
-#plt.style.use('default')
+import seaborn as sns
 
 pd.options.display.mpl_style = 'default'
 
@@ -61,7 +60,24 @@ grouped_props_2 = data.groupby('Survived')['Sex'].value_counts()/data.groupby('S
 print grouped_props_2
 
 # e
+# Histogramas
+data.groupby('Survived')['Age'].mean()
+data.boxplot(column='Age',by='Survived')
+data.hist(column='Age',by='Survived')
+sum(data[data.Survived==0]['Age'].isnull())
+sum(data[data.Survived==0]['Age'].notnull())
+data[data.Age==data['Age'].max()]
+data.hist(column='Age',by='Survived')
+data.boxplot(column='Age',by='Survived')
 
+# Histogramas y distribuciones de probabilidad
+survived_data = data[data.Age.notnull()][data.Survived==1]
+died_data = data[data.Age.notnull()][data.Survived==0]
+fig, ax = plt.subplots()
+sns.distplot(survived_data['Age'])
+sns.distplot(died_data['Age'])
+plt.show()
+pd.options.display.mpl_style = 'default'
 
 
 # f
@@ -188,7 +204,6 @@ def add_interval(row):
     return interval
 
 
-
 train = pd.read_csv('../data/titanic-train.csv', sep=';')
 train['fare_range'] = train.apply(add_interval, axis=1)
 
@@ -209,6 +224,7 @@ print('Proporciones para regla de predicción 2:')
 print(survived/total)
 
 
+# Precision y recall para train data regla de prediccion 1
 precision = 0
 recall = 0
 for i in range(20):
@@ -221,6 +237,7 @@ print('precision promedio: ' + str(precision/20))
 print('recall promedio: ' + str(recall/20))
 
 
+# Precision y recall para train data regla de prediccion 2
 precision = 0
 recall = 0
 for i in range(20):
@@ -234,12 +251,13 @@ print('recall promedio: ' + str(recall/20))
 
 
 
-
+# Importando la data de testing y agregando columna survived
 test = pd.read_csv('../data/titanic-test.csv')
 test_survived = pd.read_csv('../data/gendermodel.csv')
 test = pd.concat([test, test_survived], axis=1)
 test['fare_range'] = test.apply(add_interval, axis=1)
 
+# Precision y recall para test data regla de prediccion 1
 precision = 0
 recall = 0
 for i in range(20):
@@ -251,6 +269,7 @@ print('Regla de predicción 1 Test data:')
 print('precision promedio: ' + str(precision/20))
 print('recall promedio: ' + str(recall/20))
 
+# Precision y recall para test data regla de prediccion 2
 precision = 0
 recall = 0
 for i in range(20):
@@ -261,7 +280,3 @@ for i in range(20):
 print('Regla de predicción 2 Test data:')
 print('precision promedio: ' + str(precision/20))
 print('recall promedio: ' + str(recall/20))
-
-pd.options.display.mpl_style = None
-plt.show()
-pd.options.display.mpl_style = 'default'
