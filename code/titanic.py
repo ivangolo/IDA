@@ -115,7 +115,7 @@ def prediction(row):
 
 
 # Funcion utilizada para realizar la prediccion
-# del item h
+# del item i
 def prediction2(row):
     sex = row['Sex']
     pclass = row['Pclass']
