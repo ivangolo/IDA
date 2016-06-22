@@ -53,8 +53,7 @@ sum_squares = np.power(ytrain - ypred_train, 2)
 mse_train = mean_squared_error(ytrain, ypred_train)
 n = ytrain.shape[0]
 d = Xtrain.shape[1]
-# var_est = mse_train
-var_est = mse_train * n / (n - d)
+var_est = mse_train * n / (n - d - 1)
 diag_values = np.diag(np.linalg.pinv(np.dot(Xtrain.T, Xtrain)))
 z_scores = np.divide(linreg.coef_, np.sqrt(np.multiply(var_est, diag_values)))
 print "\n", "{:<15}{:<20}{}".format("Attribute", "Weight", "Z_score")
