@@ -106,6 +106,8 @@ ax = plt.gca()
 ax.plot(alphas_, mse_train, label='train error ridge')
 ax.plot(alphas_, mse_test, label='test error ridge')
 plt.legend(loc=2)
+plt.xlabel('alpha')
+plt.ylabel('mse')
 ax.set_xscale('log')
 ax.set_xlim(ax.get_xlim()[::-1])
 plt.show()
@@ -113,7 +115,7 @@ plt.show()
 ###################################
 #                d                #
 ###################################
-alphas_ = np.logspace(0.5, 2, base=10)
+alphas_ = np.logspace(1, -2, base=10)
 coefs = []
 model = Lasso(fit_intercept=True)
 mse_test = []
@@ -129,6 +131,8 @@ for a in alphas_:
 ax = plt.gca()
 ax.plot(alphas_, mse_train, label='train error lasso')
 ax.plot(alphas_, mse_test, label='test error lasso')
+plt.xlabel('alpha')
+plt.ylabel('mse')
 plt.legend(loc=2)
 ax.set_xscale('log')
 ax.set_xlim(ax.get_xlim()[::-1])
@@ -141,7 +145,7 @@ plt.show()
 
 def MSE(y, yhat): return np.mean(np.power(y-yhat, 2))
 
-def best_parameter(x, y, method):
+def best_parameter(x, y, method, alphas):
     Xm = x.as_matrix()
     ym = y.as_matrix()
 
@@ -153,7 +157,7 @@ def best_parameter(x, y, method):
     k_fold = cross_validation.KFold(len(Xm), 10)
     best_cv_mse = float("inf")
 
-    for a in alphas_:
+    for a in alphas:
         model.set_params(alpha=a)
         mse_list_k10 = [
                     MSE(model.fit(Xm[train], ym[train]).predict(Xm[val]), ym[val])
@@ -164,5 +168,5 @@ def best_parameter(x, y, method):
             print method, "BEST PARAMETER=%f, MSE(CV)=%f" % (best_alpha, best_cv_mse)
 
 
-best_parameter(Xtrain, ytrain, 'ridge')
-best_parameter(Xtrain, ytrain, 'lasso')
+best_parameter(Xtrain, ytrain, 'ridge', np.logspace(2, -2, base=10))
+best_parameter(Xtrain, ytrain, 'lasso', np.logspace(1, -2, base=10))
