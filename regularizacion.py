@@ -102,6 +102,7 @@ for a in alphas_:
     mse_train.append(np.mean(np.power(yhat_train - ytrain, 2)))
     mse_test.append(np.mean(np.power(yhat_test - ytest, 2)))
 
+print "MSE mínimo de test (Ridge): ", min(mse_test)
 ax = plt.gca()
 ax.plot(alphas_, mse_train, label='train error ridge')
 ax.plot(alphas_, mse_test, label='test error ridge')
@@ -115,7 +116,7 @@ plt.show()
 ###################################
 #                d                #
 ###################################
-alphas_ = np.logspace(1, -2, base=10)
+alphas_ = np.logspace(0, -3, base=10)
 coefs = []
 model = Lasso(fit_intercept=True)
 mse_test = []
@@ -128,6 +129,7 @@ for a in alphas_:
     mse_train.append(np.mean(np.power(yhat_train - ytrain, 2)))
     mse_test.append(np.mean(np.power(yhat_test - ytest, 2)))
 
+print "MSE mínimo de test (Lasso): ", min(mse_test)
 ax = plt.gca()
 ax.plot(alphas_, mse_train, label='train error lasso')
 ax.plot(alphas_, mse_test, label='test error lasso')
@@ -144,6 +146,7 @@ plt.show()
 
 
 def MSE(y, yhat): return np.mean(np.power(y-yhat, 2))
+
 
 def best_parameter(x, y, method, alphas):
     Xm = x.as_matrix()
@@ -169,4 +172,4 @@ def best_parameter(x, y, method, alphas):
 
 
 best_parameter(Xtrain, ytrain, 'ridge', np.logspace(2, -2, base=10))
-best_parameter(Xtrain, ytrain, 'lasso', np.logspace(1, -2, base=10))
+best_parameter(Xtrain, ytrain, 'lasso', np.logspace(0, -3, base=10))

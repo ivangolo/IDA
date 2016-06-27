@@ -43,7 +43,7 @@ def fss(x, y, names_x, test_data, k=10000):
             # getting the z score that belongs to the last feature added
             z_score_candidate = z_scores[-1]
 
-            # Using absolute value of tne z score
+            # Using absolute value of the z score
             score_candidates.append((abs(z_score_candidate), mse_candidate, mse_test, candidate))
 
         score_candidates.sort()
