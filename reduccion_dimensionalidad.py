@@ -12,6 +12,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib import colors
 from collections import Counter
+from sklearn.metrics import mean_squared_error
 
 ###################################
 #                a                #
@@ -40,14 +41,16 @@ cmap = colors.ListedColormap(color_list)
 # cmap = plt.cm.get_cmap('Set3')
 mclasses = (1, 2, 3, 4, 5, 6, 7, 8, 9)
 mcolors = [cmap(i) for i in np.linspace(0, 1, 10)]
-plt.figure(figsize=(12, 8))
+fig = plt.figure()
+ax = fig.add_subplot(111)
 for lab, col in zip(mclasses, mcolors):
-    plt.scatter(Xred_pca[y == lab, 0], Xred_pca[y == lab, 1], s=40, label=lab, facecolors='none', edgecolors=col)
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-leg = plt.legend(loc='upper right', fancybox=True)
-plt.tight_layout()
-# plt.show()
+    ax.scatter(Xred_pca[y == lab, 0], Xred_pca[y == lab, 1], s=40, label=lab, facecolors='none', edgecolors=col)
+ax.set_xlabel('Principal Component 1')
+ax.set_ylabel('Principal Component 2')
+leg = ax.legend(loc='upper right', fancybox=True)
+fig.tight_layout()
+fig.savefig('img/dimred_pca.png')
+print "Imagen dimred_pca.png guardada en directorio img"
 
 ###################################
 #                d                #
@@ -59,14 +62,16 @@ cmap = colors.ListedColormap(color_list)
 # cmap = plt.cm.get_cmap('ChooseAnAppropriatePalette')
 mclasses = (1, 2, 3, 4, 5, 6, 7, 8, 9)
 mcolors = [cmap(i) for i in np.linspace(0, 1, 10)]
-plt.figure(figsize=(12, 8))
+fig = plt.figure()
+ax = fig.add_subplot(111)
 for lab, col in zip(mclasses, mcolors):
-    plt.scatter(Xred_lda[y == lab, 0], Xred_lda[y == lab, 1], label=lab, s=40, facecolors='none', edgecolors=col)
-plt.xlabel('LDA/Fisher Direction 1')
-plt.ylabel('LDA/Fisher Direction 2')
-leg = plt.legend(loc='upper right', fancybox=True)
-plt.tight_layout()
-# plt.show()
+    ax.scatter(Xred_lda[y == lab, 0], Xred_lda[y == lab, 1], label=lab, s=40, facecolors='none', edgecolors=col)
+ax.set_xlabel('LDA/Fisher Direction 1')
+ax.set_ylabel('LDA/Fisher Direction 2')
+leg = ax.legend(loc='upper right', fancybox=True)
+fig.tight_layout()
+fig.savefig('img/dimred_lda.png')
+print "Imagen dimred_lda.png guardada en directorio img"
 
 ###################################
 #                e                #
@@ -120,19 +125,97 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.plot(*zip(*knn_model_train_points), color="b", linestyle="-", label="Train data")
 ax.plot(*zip(*knn_model_test_points), color="r", linestyle="-", label="Test data")
-ax.set_xlabel('k', fontsize=20)
-ax.set_ylabel('Score', fontsize=20)
+ax.set_xlabel('k', fontsize=16)
+ax.set_ylabel('Score', fontsize=16)
 ax.legend(loc=1, frameon=False)
 ax.tick_params(labelsize=14)
 fig.tight_layout()
-plt.show()
-
-
+fig.savefig('img/knn_plot.png')
+print "Imagen knn_plot.png guardada en directorio img"
 
 ###################################
 #                h                #
 ###################################
+models_data = {model: {'train': [], 'test': []} for model in ['LDA', 'QDA', 'KNN']}
+# print models_data
+for d in range(1, 11):
+    pca = PCA(n_components=d)
+    Xred_pca = pca.fit_transform(X_std)
+    Xred_pca_test = pca.transform(X_std_test)
 
+    # lda
+    lda_model = LDA()
+    lda_model.fit(Xred_pca, y)
+    # qda
+    qda_model = QDA()
+    qda_model.fit(Xred_pca, y)
+    # knn
+    knn_model = KNeighborsClassifier(n_neighbors=10)
+    knn_model.fit(Xred_pca, y)
+
+    # Train error
+    models_data['LDA']['train'].append((d, mean_squared_error(y, lda_model.predict(Xred_pca))))
+    models_data['QDA']['train'].append((d, mean_squared_error(y, qda_model.predict(Xred_pca))))
+    models_data['KNN']['train'].append((d, mean_squared_error(y, knn_model.predict(Xred_pca))))
+
+    # Test error
+    models_data['LDA']['test'].append((d, mean_squared_error(ytest, lda_model.predict(Xred_pca_test))))
+    models_data['QDA']['test'].append((d, mean_squared_error(ytest, qda_model.predict(Xred_pca_test))))
+    models_data['KNN']['test'].append((d, mean_squared_error(ytest, knn_model.predict(Xred_pca_test))))
+
+for model, data in models_data.items():
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
+    ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
+    ax.set_xlabel('d', fontsize=24)
+    ax.set_ylabel('Mean squared error', fontsize=24)
+    ax.legend(loc=1, prop={'size': 20}, frameon=False)
+    ax.tick_params(labelsize=18)
+    ax.set_title('PCA y ' + model)
+    fig.tight_layout()
+    fig.savefig('img/PCA_' + model + '.png')
+    print "Imagen PCA_" + model + ".png guardada en directorio img"
 ###################################
 #                i                #
 ###################################
+models_data = {model: {'train': [], 'test': []} for model in ['LDA', 'QDA', 'KNN']}
+# print models_data
+for d in range(1, 11):
+    lda = LDA(n_components=d)
+    Xred_lda = lda.fit_transform(X_std, y)
+    Xred_lda_test = lda.transform(X_std_test)
+
+    # lda
+    lda_model = LDA()
+    lda_model.fit(Xred_lda, y)
+    # qda
+    qda_model = QDA()
+    qda_model.fit(Xred_lda, y)
+    # knn
+    knn_model = KNeighborsClassifier(n_neighbors=10)
+    knn_model.fit(Xred_lda, y)
+
+    # Train error
+    models_data['LDA']['train'].append((d, mean_squared_error(y, lda_model.predict(Xred_lda))))
+    models_data['QDA']['train'].append((d, mean_squared_error(y, qda_model.predict(Xred_lda))))
+    models_data['KNN']['train'].append((d, mean_squared_error(y, knn_model.predict(Xred_lda))))
+
+    # Test error
+    models_data['LDA']['test'].append((d, mean_squared_error(ytest, lda_model.predict(Xred_lda_test))))
+    models_data['QDA']['test'].append((d, mean_squared_error(ytest, qda_model.predict(Xred_lda_test))))
+    models_data['KNN']['test'].append((d, mean_squared_error(ytest, knn_model.predict(Xred_lda_test))))
+
+for model, data in models_data.items():
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
+    ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
+    ax.set_xlabel('d', fontsize=24)
+    ax.set_ylabel('Mean squared error', fontsize=24)
+    ax.legend(loc=1, prop={'size': 20}, frameon=False)
+    ax.tick_params(labelsize=18)
+    ax.set_title('LDA y ' + model)
+    fig.tight_layout()
+    fig.savefig('img/LDA_' + model + '.png')
+    print "Imagen LDA_" + model + ".png guardada en directorio img"
