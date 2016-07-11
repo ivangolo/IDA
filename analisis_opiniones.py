@@ -8,7 +8,9 @@ from nltk.stem.porter import PorterStemmer
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import classification_report
-# from sklearn.naive_bayes import BernoulliNB, random
+from sklearn.naive_bayes import BernoulliNB, MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
 
 ###################################
 #                a                #
@@ -123,20 +125,20 @@ def score_the_model(model, x, y, xt, yt, text):
     print(classification_report(yt, model.predict(xt), target_names=['+', '-']))
 
 
-from sklearn import svm
-classifier_rbf = svm.SVC()
-classifier_rbf.fit(features_train, labels_train)
-score_the_model(classifier_rbf, features_train, labels_train, features_test, labels_test, "this movie sucks")
+# from sklearn import svm
+# classifier_rbf = svm.SVC()
+# classifier_rbf.fit(features_train, labels_train)
+# score_the_model(classifier_rbf, features_train, labels_train, features_test, labels_test, "this movie sucks")
 
 
 ###################################
 #                f                #
 ###################################
-# def do_NAIVE_BAYES(x, y, xt, yt):
-#     model = BernoulliNB()
-#     model = model.fit(x, y)
-#     score_the_model(model, x, y, xt, yt, "BernoulliNB")
-#     return model
+def do_NAIVE_BAYES(x, y, xt, yt):
+    model = BernoulliNB()
+    model = model.fit(x, y)
+    score_the_model(model, x, y, xt, yt, "BernoulliNB")
+    return model
 
 # model = do_NAIVE_BAYES(features_train, labels_train, features_test, labels_test)
 # test_pred = model.predict_proba(features_test)
@@ -147,3 +149,43 @@ score_the_model(classifier_rbf, features_train, labels_train, features_test, lab
 ###################################
 #                g                #
 ###################################
+def do_MULTINOMIAL(x, y, xt, yt):
+    model = MultinomialNB()
+    model = model.fit(x, y)
+    score_the_model(model, x, y, xt, yt, "MULTINOMIAL")
+    return model
+
+model = do_MULTINOMIAL(features_train, labels_train, features_test, labels_test)
+test_pred = model.predict_proba(features_test)
+spl = random.sample(xrange(len(test_pred)), 15)
+# for text, sentiment in zip(test_df.Text[spl], test_pred[spl]):
+#     print sentiment, text
+
+###################################
+#                h                #
+###################################
+def do_LOGIT(x, y, xt, yt):
+    start_t = time.time()
+    Cs = [0.01, 0.1, 10, 100, 1000]
+    for C in Cs:
+        print "Usando C= %f" % C
+        model = LogisticRegression(penalty='l2', C=C)
+        model = model.fit(x, y)
+        score_the_model(model, x, y, xt, yt, "LOGISTIC")
+
+do_LOGIT(features_train, labels_train, features_test, labels_test)
+
+
+###################################
+#                i                #
+###################################
+def do_SVM(x, y, xt, yt):
+    Cs = [0.01, 0.1, 10, 100, 1000]
+    for C in Cs:
+        print "El valor de C que se esta probando: %f" % C
+        model = LinearSVC(C=C)
+        model = model.fit(x, y)
+        score_the_model(model, x, y, xt, yt, "SVM")
+
+
+do_SVM(features_train, labels_train, features_test, labels_test)
