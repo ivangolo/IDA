@@ -166,6 +166,8 @@ for d in range(1, 11):
 for model, data in models_data.items():
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    print "Modelo con PCA_{}, min mse train: ".format(model), min(data['train'], key=lambda t: t[1])
+    print "Modelo con PCA_{}, min mse test: ".format(model), min(data['test'], key=lambda t: t[1])
     ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
     ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
     ax.set_xlabel('d', fontsize=24)
@@ -209,6 +211,8 @@ for d in range(1, 11):
 for model, data in models_data.items():
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    print "Modelo con LDA_{}, min mse train: ".format(model), min(data['train'], key=lambda t: t[1])
+    print "Modelo con LDA_{}, min mse test: ".format(model), min(data['test'], key=lambda t: t[1])
     ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
     ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
     ax.set_xlabel('d', fontsize=24)
