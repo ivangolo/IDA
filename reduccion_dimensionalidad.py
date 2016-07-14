@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib import colors
 from collections import Counter
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score
 
 ###################################
 #                a                #
@@ -154,24 +154,24 @@ for d in range(1, 11):
     knn_model.fit(Xred_pca, y)
 
     # Train error
-    models_data['LDA']['train'].append((d, mean_squared_error(y, lda_model.predict(Xred_pca))))
-    models_data['QDA']['train'].append((d, mean_squared_error(y, qda_model.predict(Xred_pca))))
-    models_data['KNN']['train'].append((d, mean_squared_error(y, knn_model.predict(Xred_pca))))
+    models_data['LDA']['train'].append((d, 1 - accuracy_score(y, lda_model.predict(Xred_pca))))
+    models_data['QDA']['train'].append((d, 1 - accuracy_score(y, qda_model.predict(Xred_pca))))
+    models_data['KNN']['train'].append((d, 1 - accuracy_score(y, knn_model.predict(Xred_pca))))
 
     # Test error
-    models_data['LDA']['test'].append((d, mean_squared_error(ytest, lda_model.predict(Xred_pca_test))))
-    models_data['QDA']['test'].append((d, mean_squared_error(ytest, qda_model.predict(Xred_pca_test))))
-    models_data['KNN']['test'].append((d, mean_squared_error(ytest, knn_model.predict(Xred_pca_test))))
+    models_data['LDA']['test'].append((d, 1 - accuracy_score(ytest, lda_model.predict(Xred_pca_test))))
+    models_data['QDA']['test'].append((d, 1 - accuracy_score(ytest, qda_model.predict(Xred_pca_test))))
+    models_data['KNN']['test'].append((d, 1 - accuracy_score(ytest, knn_model.predict(Xred_pca_test))))
 
 for model, data in models_data.items():
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    print "Modelo con PCA_{}, min mse train: ".format(model), min(data['train'], key=lambda t: t[1])
-    print "Modelo con PCA_{}, min mse test: ".format(model), min(data['test'], key=lambda t: t[1])
+    print "Modelo con PCA_{}, min error train: ".format(model), min(data['train'], key=lambda t: t[1])
+    print "Modelo con PCA_{}, min error test: ".format(model), min(data['test'], key=lambda t: t[1])
     ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
     ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
     ax.set_xlabel('d', fontsize=24)
-    ax.set_ylabel('Mean squared error', fontsize=24)
+    ax.set_ylabel('Error', fontsize=24)
     ax.legend(loc=1, prop={'size': 20}, frameon=False)
     ax.tick_params(labelsize=18)
     ax.set_title('PCA y ' + model)
@@ -199,24 +199,24 @@ for d in range(1, 11):
     knn_model.fit(Xred_lda, y)
 
     # Train error
-    models_data['LDA']['train'].append((d, mean_squared_error(y, lda_model.predict(Xred_lda))))
-    models_data['QDA']['train'].append((d, mean_squared_error(y, qda_model.predict(Xred_lda))))
-    models_data['KNN']['train'].append((d, mean_squared_error(y, knn_model.predict(Xred_lda))))
+    models_data['LDA']['train'].append((d, 1 - accuracy_score(y, lda_model.predict(Xred_lda))))
+    models_data['QDA']['train'].append((d, 1 - accuracy_score(y, qda_model.predict(Xred_lda))))
+    models_data['KNN']['train'].append((d, 1 - accuracy_score(y, knn_model.predict(Xred_lda))))
 
     # Test error
-    models_data['LDA']['test'].append((d, mean_squared_error(ytest, lda_model.predict(Xred_lda_test))))
-    models_data['QDA']['test'].append((d, mean_squared_error(ytest, qda_model.predict(Xred_lda_test))))
-    models_data['KNN']['test'].append((d, mean_squared_error(ytest, knn_model.predict(Xred_lda_test))))
+    models_data['LDA']['test'].append((d, 1 - accuracy_score(ytest, lda_model.predict(Xred_lda_test))))
+    models_data['QDA']['test'].append((d, 1 - accuracy_score(ytest, qda_model.predict(Xred_lda_test))))
+    models_data['KNN']['test'].append((d, 1 - accuracy_score(ytest, knn_model.predict(Xred_lda_test))))
 
 for model, data in models_data.items():
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    print "Modelo con LDA_{}, min mse train: ".format(model), min(data['train'], key=lambda t: t[1])
-    print "Modelo con LDA_{}, min mse test: ".format(model), min(data['test'], key=lambda t: t[1])
+    print "Modelo con LDA_{}, min error train: ".format(model), min(data['train'], key=lambda t: t[1])
+    print "Modelo con LDA_{}, min error test: ".format(model), min(data['test'], key=lambda t: t[1])
     ax.plot(*zip(*data['train']), color="b", linestyle="-", label="Train data")
     ax.plot(*zip(*data['test']), color="r", linestyle="-", label="Test data")
     ax.set_xlabel('d', fontsize=24)
-    ax.set_ylabel('Mean squared error', fontsize=24)
+    ax.set_ylabel('Error', fontsize=24)
     ax.legend(loc=1, prop={'size': 20}, frameon=False)
     ax.tick_params(labelsize=18)
     ax.set_title('LDA y ' + model)

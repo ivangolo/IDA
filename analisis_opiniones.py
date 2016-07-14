@@ -112,11 +112,11 @@ vocab = vectorizer.get_feature_names()
 dist_train = list(np.array(features_train.sum(axis=0)).reshape(-1,))
 tag_count_train = zip(vocab, dist_train)
 print "Training dataset:"
-print sorted(tag_count_train[:10], key=lambda x: x[1], reverse=True)  # primeras 100
+print sorted(tag_count_train[:10], key=lambda x: x[1], reverse=True)  # primeras 10
 dist_test = list(np.array(features_test.sum(axis=0)).reshape(-1,))
 tag_count_test = zip(vocab, dist_test)
 print "Test dataset:"
-print sorted(tag_count_test[:10], key=lambda x: x[1], reverse=True)  # primeras 100
+print sorted(tag_count_test[:10], key=lambda x: x[1], reverse=True)  # primeras 10
 
 
 ###################################
@@ -173,7 +173,7 @@ def do_LOGIT(x, y, xt, yt):
         model = model.fit(x, y)
         score_the_model(model, x, y, xt, yt, "LOGISTIC")
 
-# do_LOGIT(features_train, labels_train, features_test, labels_test)
+do_LOGIT(features_train, labels_train, features_test, labels_test)
 
 
 ###################################
@@ -188,4 +188,4 @@ def do_SVM(x, y, xt, yt):
         score_the_model(model, x, y, xt, yt, "SVM")
 
 
-# do_SVM(features_train, labels_train, features_test, labels_test)
+do_SVM(features_train, labels_train, features_test, labels_test)
